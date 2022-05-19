@@ -65,6 +65,7 @@ dependencies {
     runtimeOnly("org.lwjgl", "lwjgl-opengl", classifier = "natives-$lwjglNatives")
     runtimeOnly("org.lwjgl", "lwjgl-stb", classifier = "natives-$lwjglNatives")
     implementation("org.joml", "joml", "1.10.4")
+
 }
 
 application {

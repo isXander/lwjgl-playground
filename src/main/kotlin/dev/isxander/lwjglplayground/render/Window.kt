@@ -1,7 +1,9 @@
-package dev.isxander.lwjglplayground
+package dev.isxander.lwjglplayground.render
 
+import dev.isxander.lwjglplayground.LwjglPlayground
+import dev.isxander.lwjglplayground.gameplay.Player
 import dev.isxander.lwjglplayground.input.KeyInputHandler
-import dev.isxander.lwjglplayground.utils.glfw
+import dev.isxander.lwjglplayground.utils.*
 import org.lwjgl.glfw.GLFW
 import org.lwjgl.system.MemoryStack
 import org.lwjgl.system.MemoryUtil
@@ -79,34 +81,42 @@ class Window {
         if (setup)
             error("Cannot setup window twice!")
 
-        println("window setup")
-
         GLFW.glfwDefaultWindowHints()
         GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, false.glfw)
         resizable = true
 
         handle = GLFW.glfwCreateWindow(width, height, title, MemoryUtil.NULL, MemoryUtil.NULL)
 
-        if (handle == MemoryUtil.NULL)
+        if (handle.isGlfwNull())
             error("Failed to create GLFW window!")
-
-        KeyInputHandler.setupCallbacks()
 
         centerWindow()
 
         GLFW.glfwMakeContextCurrent(handle)
-        vsync = false
+        vsync = true
 
-        GLFW.glfwSetWindowSizeCallback(handle) { windowHandle, width, height ->
-            if (windowHandle != handle)
-                return@glfwSetWindowSizeCallback
-
-            this.width = width
-            this.height = height
-        }
+        GLFW.glfwSetWindowSizeCallback(handle, this::onWindowResize)
+        GLFW.glfwSetKeyCallback(handle, this::onKeyPress)
 
         visible = true
         setup = true
+    }
+
+    private fun onKeyPress(windowHandle: Long, keycode: Int, scancode: Int, action: Int, mods: Int) {
+        if (windowHandle != handle)
+            return
+
+        KeyInputHandler.onKeyPress(keycode, action, mods)
+    }
+
+    private fun onWindowResize(windowHandle: Long, width: Int, height: Int) {
+        if (windowHandle != handle)
+            return
+
+        this.width = width
+        this.height = height
+
+        LwjglPlayground.setupOrtho()
     }
 
     fun centerWindow() {
